@@ -1,5 +1,5 @@
 import appz
-from appz.class_menus import Menus
+from appz.clase_menus import Menus
 
 
 if __name__ == '__main__':
