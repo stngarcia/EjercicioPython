@@ -1,151 +1,166 @@
 import copy
-from .funciones import *
 from .clase_ingresos import Ingresos
-from .clases.persona import Persona
-from.clases.credito import Credito
-from .enumeraciones.enum_regexp import EnumRegExp
+from .enumeraciones.enum_regexp import EnumRegEx
+from .funciones import pressEnter, titulo
 
 
-# ---
-# Funcion para ingresar datos del cliente.
-# ---
-def IngresarCliente(miCliente):
-    __mostrarCabecera(miCliente)
-    __RealizarIngreso(miCliente)
-    PresionarEnter("El cliente ha sido creado.")
+def ingresarCliente(cliente):
+    __cabecera(cliente)
+    __leerDatos(cliente)
+    pressEnter("El cliente ha sido creado.")
 
 
-# ---
-# Mostrar cabecera del ingreso.
-# ---
-def __mostrarCabecera(miCliente):
-    if miCliente.existeCliente():
-        mostrarTitulo("")
-        miCliente.mostrarDatos()
+def __cabecera(cliente):
+    if cliente.existeCliente():
+        titulo("")
+        cliente.mostrarDatos()
     else:
-        mostrarTitulo("Ingresar cliente.")
+        titulo("Ingresar cliente.")
 
 
-# ---
-# Realiza el ingreso de datos del cliente.
-# ---
-def __RealizarIngreso(miCliente):
+def __leerDatos(cliente):
     miIngreso = Ingresos()
-    miCliente.setNombre(__IngresarNombre(miIngreso))
-    miCliente.setRut(__IngresarRut(miIngreso))
-    miCliente.setMail(__IngresarMail(miIngreso))
-    miCliente.setTipoCliente(__IngresarTipoCliente(miIngreso))
+    cliente.setNombre(__leeNombre(miIngreso))
+    cliente.setRut(__leeRut(miIngreso))
+    cliente.setMail(__leeMail(miIngreso))
+    cliente.setTipoCliente(__leeTipo(miIngreso))
 
 
-# ---
-# Funcion para el ingreso del nombre.
-# ---
-def __IngresarNombre(miIngreso):
+def __leeNombre(miIngreso):
     campo = "nombre cliente"
     requerido = True
-    patron = EnumRegExp.NOMBRE
+    patron = EnumRegEx.NOMBRE
     return miIngreso.ingresarCadena(campo, patron, requerido).title()
 
 
-# ---
-# Funcion para el ingreso del rut.
-# ---
-def __IngresarRut(miIngreso):
+def __leeRut(miIngreso):
     campo = "rut cliente"
     requerido = True
-    patron = EnumRegExp.RUT
+    patron = EnumRegEx.RUT
     return miIngreso.ingresarCadena(campo, patron, requerido)
 
 
-# ---
-# Funcion para el ingreso del email.
-# ---
-def __IngresarMail(miIngreso):
+def __leeMail(miIngreso):
     campo = "e-mail"
     requerido = False
-    patron = EnumRegExp.EMAIL
+    patron = EnumRegEx.EMAIL
     return miIngreso.ingresarCadena(campo, patron, requerido)
 
 
-# ---
-# Funcion para ingresar el tipo de cliente.
-# ---
-def __IngresarTipoCliente(miIngreso):
+def __leeTipo(miIngreso):
     tipos = {'N': 'Cliente normal', 'P': 'Cliente preferencial'}
     campo = "tipo de cliente"
     return miIngreso.ingresarCaracter(campo, tipos)
 
 
-# ---
-# Funcion parapara la opcion de cambio de tipo de cliente.
-# ---
-def CambiarTipoCliente(miCliente):
-    __mostrarCabecera(miCliente)
-    if miCliente.existeCliente():
-        __RealizarCambioTipo(miCliente)
-        PresionarEnter("El tipo de cliente ha sido cambiado.")
-    else:
-        PresionarEnter("No se ha ingresado un cliente para cambiar su tipo.")
+def cambiarTipo(cliente):
+    __cabecera(cliente)
+    if not cliente.existeCliente():
+        pressEnter("No se ha ingresado un cliente para cambiar su tipo.")
+        return
+    __cambiaTipo(cliente)
+    pressEnter("El tipo de cliente ha sido cambiado.")
 
 
-# ---
-# Cambiar el tipo de cliente.
-# ---
-def __RealizarCambioTipo(miCliente):
+def __cambiaTipo(cliente):
     miIngreso = Ingresos()
-    miCliente.setTipoCliente(__IngresarTipoCliente(miIngreso))
+    cliente.setTipoCliente(__leeTipo(miIngreso))
 
 
-# ---
-# Asignar un credito al cliente.
-# ---
-def AsignarCredito(miCliente, miCredito):
-    mostrarTitulo("Asignación de credito a cliente.")
-    __VisualizarClienteCredito(miCliente, miCredito)
-    if miCliente.existeCliente() and miCredito.existeCredito():
-        mensaje = ""
-        if miCliente.getCredito().getCodigoCredito()==miCredito.getCodigoCredito():
-            PresionarEnter("El cliente ya posee el crédito.")
-            return
-        miOpcion = __IngresarOpcionDeAsignacion()
-        if miOpcion == "S":
-            miCliente.setCredito(copy.copy(miCredito))
-            mensaje = "Crédito fue asociado al cliente."
-        else:
-            mensaje = "El crédito no se asocio."
-        PresionarEnter(mensaje)
-    else:
-        PresionarEnter(__ErrorAsignacion(miCliente, miCredito))
+def AsignaCredito(cliente, credito):
+    titulo("Asignación de credito a cliente.")
+    __muestraClienteCredito(cliente, credito)
+    if not cliente.existeCliente() or not credito.existeCredito():
+        pressEnter(__msgAsignacion(cliente, credito))
+        return
+    if cliente.getCredito().getCodigoCredito() == credito.getCodigoCredito():
+        pressEnter("El cliente ya posee el crédito.")
+        return
+    pagadas = cliente.getCredito().getCuotasPagadas()
+    pactadas = cliente.getCredito().getCuotasPactadas()
+    if (pactadas-pagadas) != 0:
+        pressEnter("Cliente esta pagando el crédito, no puede asignar otro.")
+        return
+    miOpcion = __leeAsignacion()
+    if miOpcion == "N":
+        pressEnter("El crédito no se asocio.")
+        return
+    cliente.setCredito(copy.copy(credito))
+    pressEnter("Crédito fue asociado al cliente.")
 
 
-# ---
-# Mostrar datos de cliente y credito para la asignacion.
-# ---
-def __VisualizarClienteCredito(miCliente, miCredito):
-    if miCliente.existeCliente():
-        miCliente.mostrarDatos()
-    if miCredito.existeCredito():
-        miCredito.mostrarDatos()
+def __muestraClienteCredito(cliente, credito):
+    if cliente.existeCliente():
+        cliente.mostrarDatos()
+    if credito.existeCredito():
+        credito.mostrarDatos()
 
 
-# ---
-# Funcion para ingresaropcion de asignacion.
-# ---
-def __IngresarOpcionDeAsignacion():
+def __leeAsignacion():
     miIngreso = Ingresos()
     misOpciones = {'S': 'Asociar crédito', 'N': 'No asociar'}
     campo = "opción"
     return miIngreso.ingresarCaracter(campo, misOpciones)
 
 
-# ---
-# Muestra el mensaje de error de la asociacion.
-# ---
-def __ErrorAsignacion(miCliente, miCredito):
-    if not miCliente.existeCliente() and not miCredito.existeCredito():
+def __msgAsignacion(cliente, credito):
+    if not cliente.existeCliente() and not credito.existeCredito():
         return"No hay cliente ni crédito ingresado."
-    if not miCliente.existeCliente():
+    if not cliente.existeCliente():
         return "No hay un cliente ingresado."
-    if not miCredito.existeCredito():
+    if not credito.existeCredito():
         return "No hay un crédito ingresado."
     return""
+
+
+def cambiaMorosidad(cliente):
+    titulo("Cambiar el estado del crédito.")
+    if not __verificaCliente(cliente):
+        return
+    miOpcion = __leerEstado()
+    credito = cliente.getCredito()
+    credito.setMorosidad(False if miOpcion == "A" else True)
+    pressEnter("El estado del crédito del cliente ha cambiado.")
+
+
+def __verificaCliente(cliente):
+    if not cliente.existeCliente():
+        pressEnter("No hay cliente ingresado")
+        return False
+    cliente.mostrarDatos()
+    if not cliente.getCredito().existeCredito():
+        pressEnter("El cliente no tiene un crédito asociado")
+        return False
+    return True
+
+
+def __leerEstado():
+    miIngreso = Ingresos()
+    misOpciones = {'M': 'Cliente moroso', 'A': 'Cliente al día'}
+    campo = "opción"
+    return miIngreso.ingresarCaracter(campo, misOpciones)
+
+
+def pagarCuota(cliente):
+    while True:
+        titulo("Pagar cuota de credito.")
+        if not __verificaCliente(cliente):
+            break
+        cuota = cliente.getCredito().getCuotasPagadas()
+        if cuota == cliente.getCredito().getCuotasPactadas():
+            pressEnter(
+                "Cliente finalizo el crédito, venda otro altiro!!")
+            break
+        print("Pagar cuota número", cuota + 1)
+        opcion = __leerPago()
+        if opcion == "X":
+            break
+        cuota = cuota+1
+        cliente.getCredito().setCuotasPagadas(cuota)
+
+
+def __leerPago():
+    miIngreso = Ingresos()
+    misOpciones = {'P': 'Pagar una cuota', 'X': 'Salir de pagos'}
+    campo = "opción"
+    return miIngreso.ingresarCaracter(campo, misOpciones)

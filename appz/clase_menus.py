@@ -1,53 +1,49 @@
+from .accionesCliente import ingresarCliente, cambiarTipo, pagarCuota
+from .accionesCliente import AsignaCredito, cambiaMorosidad
+from .accionesCreditos import ingresaCredito
 from .clase_ingresos import Ingresos
-from .funciones import mostrarTitulo
-from .accionesCliente import *
-from .accionesCreditos import *
-from .clases.persona import Persona
 from .clases.credito import Credito
-from .enumeraciones.enum_regexp import EnumRegExp
+from .clases.persona import Persona
+from .enumeraciones.enum_regexp import EnumRegEx
+from .funciones import titulo
 
 
-# ---
-# Clase para el manejo del menu principal.
-# ---
 class Menus(object):
 
-    # ---
-    # Metodo para mostrar las opciones de menu.
-    # ---
-    def __mostrarOpciones(self):
-        mostrarTitulo("Opciones disponibles.")
+    def __opciones(self):
+        titulo("Opciones disponibles.")
         print("1. Crear crédito.")
         print("2. Datos de cliente.")
         print("3. Cambiar tipo de cliente.")
         print("4. Asignar el crédito al cliente.")
         print("5. Cambiar estado del credito.")
-        print("6. Obtener meses de gracia.")
-        print("7. Obtener el total a pagar.")
+        print("6. Pagar cuota.")
+        print("7. Obtener meses de gracia.")
+        print("8. Obtener el total a pagar.")
         print("0. Salir")
         print()
 
-
-# ---
-# Funcion para generar el menu principal de la aplicacion.
-# ---
-    def getMenuPrincipal(self):
-        miCliente = Persona()
-        miCredito = Credito()
+    def mostrarMenu(self):
+        cliente = Persona()
+        credito = Credito()
         opcion = 1
         miEntrada = Ingresos()
         while opcion != 0:
-            self.__mostrarOpciones()
-            opcion = miEntrada.ingresarNumero(
-                "Ingrese opción", 0, 7, EnumRegExp.NUMERO)
+            self.__opciones()
+            opcion = miEntrada.ingresaNumero(
+                "Ingrese opción", 0, 7, EnumRegEx.NUMERO)
             if opcion == 1:
-                IngresarCredito(miCredito)
+                ingresaCredito(credito)
             if opcion == 2:
-                IngresarCliente(miCliente)
-            if opcion==3:
-                CambiarTipoCliente(miCliente)
-            if opcion==4:
-                AsignarCredito(miCliente,miCredito)
+                ingresarCliente(cliente)
+            if opcion == 3:
+                cambiarTipo(cliente)
+            if opcion == 4:
+                AsignaCredito(cliente, credito)
+            if opcion == 5:
+                cambiaMorosidad(cliente)
+            if opcion == 6:
+                pagarCuota(cliente)
             if opcion == 0:
-                print("Adios!")
-                return
+                print("Eso fue todo, chao!")
+                break

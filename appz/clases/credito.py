@@ -82,23 +82,32 @@ class Credito(object):
 # Customers.
 # ---
     def mostrarDatos(self):
-        fmt='%d/%m/%Y'
+        fmt = '%d/%m/%Y'
         print("Datos de credito")
         print("-".rjust(80, '-'))
         print("Código: ", self.getCodigoCredito())
-        print("Fecha solicitud: ", datetime.strftime( self.getFechaSolicitud(), fmt))
-        print("Fecha vencimiento: ", datetime.strftime( self.getFechaVencimiento(), fmt))
+        print("Fecha solicitud: ", datetime.strftime(
+            self.getFechaSolicitud(), fmt))
+        print("Fecha vencimiento: ", datetime.strftime(
+            self.getFechaVencimiento(), fmt))
         print("Monto $", self.getMonto())
         print("Cuotas pactadas: ", self.getCuotasPactadas())
         print("Valor cuota $", self.getValorCuota())
         print("Tiene morosidad:", self.getMorosidad())
         print("Cuotas pagadas:", self.getCuotasPagadas())
+        if self.getCuotasPactadas() == self.getCuotasPagadas():
+            print("Credito finalizado!")
         print("-".rjust(80, '-'))
         print()
 
 
 # ---
-# Metodo str muestra el codigo del credito las fechas de solicitud y vencimiento junto con el monto.
+# Metodo str
+# muestra el codigo del credito las fechas de solicitud y vencimiento
+#  junto con el monto.
 # ---
     def __str__(self):
-        return "Credito: " + self.getCodigoCredito() + " fue solicitado el " + self.getFechaSolicitud() + " por el monto de $" + self.getMonto() + ", este vence los " + self.getFechaVencimiento()
+        cadena = "Crédito {0}, solicitado {1} monto ${2} termina el {3}"
+        cadena.format(self.getCodigoCredito(), self.getFechaSolicitud(
+        ), self.getMonto(), self.getFechaVencimiento())
+        return cadena

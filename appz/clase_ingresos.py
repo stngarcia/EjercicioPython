@@ -1,109 +1,94 @@
 import re
-from datetime import datetime, date, timedelta
+from datetime import datetime
+from .enumeraciones.enum_msg import EnumMsg
 
 
-# ---
-# Clase para la manipulacion de los ingresos de la aplicacion
-# ---
 class Ingresos(object):
 
-    # ---
-    # Metodo para aceptar entradas numericas.
-    # ---
-    def ingresarNumero(self, mensaje, minimo, maximo, patron):
+    def ingresaNumero(self, mensaje, minimo, maximo, patron):
         valor = 0
-        rango = ", debe ser igual o superior a " + \
-            str(minimo) if maximo == 0 else ", se admiten valores entre ["+str(
-                minimo)+"-"+str(maximo)+"]"
+        if maximo == 0:
+            rango = ", debe ser igual o mayor a {0}"
+            rango = rango.format(str(minimo))
+        else:
+            rango = ", valores entre {0} y {1}"
+            rango = rango.format(str(minimo), str(maximo))
         while True:
             print(mensaje, rango, end=": ")
-            miOpcion = input()
-            if not self.__ValidarFormato(patron, miOpcion, "Solo se admiten números."):
+            opcion = input()
+            if not self.__validaExp(patron, opcion, EnumMsg.NUMERO_INVALIDO):
                 continue
-            valor = int(miOpcion)
+            valor = int(opcion)
             if maximo == 0:
                 if valor < minimo:
-                    print("Debe ingresar valores superiora", minimo)
+                    print(EnumMsg.NUMERO_MENOR.format(str(minimo)))
                     continue
             else:
                 if valor < minimo or valor > maximo:
-                    print("Debe ingresar solo valores entre ",
-                          minimo, " y ", maximo)
+                    print(EnumMsg.NUMERO_FUERA_RANGO.format(
+                        str(minimo), str(maximo)))
                     continue
             break
         return valor
 
-
-# ---
-# Validar el formato de las entradas.
-# ---
-    def __ValidarFormato(self, patron, valor, mensajeError):
+    def __validaExp(self, patron, valor, msgError):
         if len(patron) == 0:
             return True
-        if re.match(patron, valor) == None:
-            print(mensajeError)
+        if not re.match(patron, valor):
+            print(msgError)
             return False
         return True
 
-
-# ---
-# Metodo para el ingreso de cadenas de caracteres.
-# ---
     def ingresarCadena(self, campo, patron, requerido):
-        mensajeError = "El formato de " + campo + " no es valido."
+        msgError = EnumMsg.CADENA_INVALIDA.format(campo)
         while True:
             print("Ingrese", campo, end=": ")
-            miOpcion = input()
-            if requerido and len(miOpcion) == 0:
-                print("El campo ", campo, " no puede quedar vacio.")
+            cadena = input()
+            if requerido and len(cadena) == 0:
+                print(EnumMsg.CADENA_VACIA.format(campo))
                 continue
-            if not self.__ValidarFormato(patron, miOpcion, mensajeError):
+            if not self.__validaExp(patron, cadena, msgError):
                 continue
             break
-        return miOpcion
+        return cadena
 
-
-# ---
-# Metodo que permite seleccionar el caracter de una lista de opciones.
-# ---
-    def ingresarCaracter(self, campo, listaCaracteres):
+    def ingresarCaracter(self, campo, listaOpc):
         cadena = ""
-        for clave, valor in listaCaracteres.items():
-            cadena = cadena + "'"+clave+"':"+valor+", "
+        for clave, valor in listaOpc.items():
+            cadena += "'{0}': {1}, ".format(clave, valor)
         while True:
-            print("Ingrese ", campo, "[" + cadena.rstrip(', '), "]", end=": ")
-            miOpcion = input()
-            if miOpcion.upper() not in listaCaracteres:
-                print("Se admiten solo las siguientes opciones:")
+            print("Ingrese {0} [{1}]".format(
+                campo, cadena.rstrip(', ')), end=": ")
+            opcion = input()
+            if opcion.upper() not in listaOpc:
+                print(EnumMsg.VALOR_INVALIDO)
                 print(cadena.rstrip(', '))
                 continue
             break
-        return miOpcion.upper()
+        return opcion.upper()
 
-    # ---
-    # Metodo para aceptar entradas numericas.
-    # ---
     def ingresarFecha(self, mensaje, minimo, maximo, patron):
         fmt = '%d/%m/%Y'
-        fechaMin = self.__obtenerFecha(minimo)
-        fechaMax = self.__obtenerFecha(maximo)
-        rango = "" if len(minimo) == 0 else ", rangos aceptado ["+datetime.strftime(
-            fechaMin, fmt) + "-"+datetime.strftime(fechaMax, fmt)
+        msgError = EnumMsg.FECHA_INVALIDA
+        fecMin = self.__obtenerFecha(minimo)
+        fecMax = self.__obtenerFecha(maximo)
+        rango = "" if len(minimo) == 0 else ", rango ["+datetime.strftime(
+            fecMin, fmt) + "-"+datetime.strftime(fecMax, fmt)
         while True:
             print(mensaje, rango, end=": ")
-            miOpcion = input()
-            if not self.__ValidarFormato(patron, miOpcion, "Formato de fecha inválido, el formato es dd/mm/yyyy."):
+            fecha = input()
+            if not self.__validaExp(patron, fecha, msgError):
                 continue
-            valor = self.__obtenerFecha(miOpcion)
+            valor = self.__obtenerFecha(fecha)
             if len(maximo) == 0:
-                if valor < fechaMin:
-                    print("Debe ingresar una fecha superior o igual a",
-                          datetime.strftime(fechaMin, fmt))
+                if valor < fecMin:
+                    print(EnumMsg.FECHA_MENOR.format(
+                        datetime.strftime(fecMin, fmt)))
                     continue
             else:
-                if valor < fechaMin or valor > fechaMax:
-                    print("Debe ingresar fecha entre ", datetime.strftime(
-                        fechaMin, fmt), " y ", datetime.strftime(fechaMax, fmt))
+                if valor < fecMin or valor > fecMax:
+                    print(EnumMsg.FECHA_FUERA_RANGO.format(datetime.strftime(
+                        fecMin, fmt), datetime.strftime(fecMax, fmt)))
                     continue
             break
         return valor
@@ -112,7 +97,9 @@ class Ingresos(object):
 # ---
 # Metodo para formatear las fechas y que sean comparables.
 # ---
-    def __obtenerFecha(self, cadenaFecha):
+    def __obtenerFecha(self, valFecha):
         fmt = '%d/%m/%Y'
-        fechaActual = datetime.strftime(datetime.now().date(), fmt)
-        return datetime.strptime(fechaActual, fmt) if len(cadenaFecha) == 0 else datetime.strptime(cadenaFecha, fmt)
+        fecha = datetime.strftime(datetime.now().date(), fmt)
+        if len(valFecha) == 0:
+            return datetime.strptime(fecha, fmt)
+        return datetime.strptime(valFecha, fmt)

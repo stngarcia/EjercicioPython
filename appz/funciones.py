@@ -1,32 +1,32 @@
-# ---
-# Funcion  para limpiar pantalla.
-# ---
+# Archivo: funciones.py
+# Funciones de uso comun.
+
+import os
 
 
-def limpiarPantalla():
-    import os
+# cls():
+# Limpiar pantalla.
+def cls():
     if os.name in ("ce", "nt", "dos"):
         os.system("cls")
     else:
         os.system("clear")
 
 
-# ---
-# Mostrar un titulo en pantalla
-# ---
-def mostrarTitulo(titulo):
-    limpiarPantalla()
-    if len(titulo) > 0:
-        print(titulo)
-        for letra in titulo:
-            print("-", end="")
-        print()
+# titulo([titulo]):
+# Muestra un titulo en pantalla.
+def titulo(titulo):
+    cls()
+    if len(titulo) == 0:
+        return
+    print(titulo)
+    print("-".rjust(len(titulo), '-'))
+    print()
 
 
-# ---
-# Mostrar un mensaje y esperar presionar tecla enter.
-# ---
-def PresionarEnter(mensaje):
+# pressEnter([mensaje]): Espera la pulsación de la tecla < ENTER >
+# mostrando u mensaje(opcional).
+def pressEnter(mensaje):
     print()
     if len(mensaje) > 0:
         print(mensaje)
