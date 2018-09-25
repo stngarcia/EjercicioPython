@@ -1,5 +1,5 @@
 from .accionesCliente import ingresarCliente, cambiarTipo, pagarCuota
-from .accionesCliente import AsignaCredito, cambiaMorosidad
+from .accionesCliente import AsignaCredito, cambiaMorosidad, mostrarCancelado
 from .accionesCreditos import ingresaCredito
 from .clase_ingresos import Ingresos
 from .clases.credito import Credito
@@ -44,6 +44,8 @@ class Menus(object):
                 cambiaMorosidad(cliente)
             if opcion == 6:
                 pagarCuota(cliente)
+            if opcion == 7:
+                mostrarCancelado(cliente)
             if opcion == 0:
                 print("Eso fue todo, chao!")
                 break

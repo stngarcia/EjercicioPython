@@ -162,3 +162,20 @@ def __leerPago():
     misOpciones = {'P': 'Pagar una cuota', 'X': 'Salir de pagos'}
     campo = "opción"
     return miIngreso.ingresarCaracter(campo, misOpciones)
+
+
+def mostrarCancelado(cliente):
+    titulo("Mostrar montos cancelados")
+    if not __verificaCliente(cliente):
+        return
+    credito = cliente.getCredito()
+    if credito.getCuotasMorosas() > 1:
+        print("Cuotas morosas:", credito.getCuotasMorosas())
+        print(
+            "Monto cancelado por mora ${0}.-".format(credito.getCanceladoConMora()))
+        print("Interés aaplicar {0:.2f}%".format(credito.getInteresAplicado()))
+    print("Total cancelado ${0}.-".format(credito.getMontoCancelado()))
+    print(
+        "Falta por cancelar ${0}.-".format(credito.getMonto()-credito.getMontoCancelado()))
+
+    pressEnter("")

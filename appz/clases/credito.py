@@ -15,6 +15,7 @@ class Credito(object):
         self.__cuotasPagadas = 0
         self.__cuotasMorosas = 1
         self.__montoCancelado = 0
+        self.__montoCanceladoMoroso = 0
 
     def getCodigo(self):
         return self.__codigo
@@ -37,7 +38,7 @@ class Credito(object):
         return self.__cuotasPagadas
 
     def getCuotasMorosas(self):
-        self.__cuotasMorosas
+        return self.__cuotasMorosas
 
     def getCuotasPactadas(self):
         diferencia = int((self.getFechaVencimiento() -
@@ -67,6 +68,12 @@ class Credito(object):
     def getMontoCancelado(self):
         return self.__montoCancelado
 
+    def getCanceladoConMora(self):
+        return self.__montoCanceladoMoroso
+
+    def getInteresAplicado(self):
+        return (self.__interes*self.__cuotasMorosas)
+
     def setCodigo(self, codigo):
         self.__codigo = codigo
 
@@ -87,7 +94,9 @@ class Credito(object):
         valorCancelado = self.getValorCuota()
         if self.getMorosidad():
             self.__cuotasMorosas = self.__cuotasMorosas+1
-            valorCancelado = valorCancelado + self.getValorInteres()
+            interes = self.getValorInteres()
+            self.__montoCanceladoMoroso = self.__montoCanceladoMoroso + interes
+            valorCancelado = valorCancelado + interes
         self.__montoCancelado = self.__montoCancelado+valorCancelado
 
     def existe(self):
@@ -101,7 +110,7 @@ class Credito(object):
         if self.getMorosidad():
             valorInteres = self.getValorInteres()
             print(
-                "Interés aplicado {0} %: ${1}.- ".format((self.__interes*self.__cuotasMorosas), valorInteres))
+                "Interés aplicado {0:.2f} %: ${1}.- ".format(self.getInteresAplicado(), valorInteres))
             print(
                 "Total valor cuota a pagar ${0}.-".format((self.getValorCuota()+valorInteres)))
 
