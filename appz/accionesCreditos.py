@@ -11,16 +11,16 @@ def ingresaCredito(credito):
 
 
 def __cabecera(credito):
-    if credito.existeCredito():
+    if credito.existe():
         titulo("")
-        credito.mostrarDatos()
+        credito.getDatos()
     else:
         titulo("Ingresar crédito.")
 
 
 def __leerDatos(credito):
     miIngreso = Ingresos()
-    credito.setCodigoCredito(__leeCodigo(miIngreso))
+    credito.setCodigo(__leeCodigo(miIngreso))
     credito.setFechaSolicitud(__leeFechaSolicitud(miIngreso))
     credito.setFechaVencimiento(__leeFechaVencimiento(
         miIngreso, credito.getFechaSolicitud()))

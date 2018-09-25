@@ -2,7 +2,7 @@ from .credito import Credito
 
 
 class Persona(object):
-    # Constructores
+
     def __init__(self):
         self.__rut = ""
         self.__nombre = ""
@@ -10,10 +10,6 @@ class Persona(object):
         self.__tipo = ""
         self.__credito = Credito()
 
-
-# ---
-    # Accesadores.
-# ---
     def getRut(self):
         return self.__rut
 
@@ -23,7 +19,7 @@ class Persona(object):
     def getMail(self):
         return self.__mail
 
-    def getTipoCliente(self):
+    def getTipo(self):
         if self.__tipo == "N":
             return "Cliente normal"
         if self.__tipo == "P":
@@ -33,10 +29,6 @@ class Persona(object):
     def getCredito(self):
         return self.__credito
 
-
-# ---
-    # Mutadores.
-# ---
     def setRut(self, rut):
         self.__rut = rut
 
@@ -46,61 +38,38 @@ class Persona(object):
     def setMail(self, mail):
         self.__mail = mail
 
-    def setTipoCliente(self, tipo):
+    def setTipo(self, tipo):
         self.__tipo = tipo
 
     def setCredito(self, credito):
         self.__credito = credito
 
-
-# ---
-# Metodo para indicar si hay un cliente ingresado.
-# ---
-    def existeCliente(self):
+    def existe(self):
         return False if len(self.getRut()) == 0 else True
 
+    def conCredito(self):
+        return False if len(self.getCredito().getCodigo()) == 0 else True
 
-# ---
-# Metodo que indica si el cliente tiene un credito asociado.
-# ---
-    def tieneCredito(self):
-        return False if len(self.__credito.getCodigoCredito()) == 0 else True
-
-
-# ---
-# Metodo para mostrar los datos del cliente.
-# ---
-    def mostrarDatos(self):
+    def getDatos(self):
         print("Datos del cliente.")
         print("-".rjust(80, '-'))
-        self.__visualizarCliente()
-        self.__visualizarCredito()
+        self.__verCliente()
+        self.__verCredito()
         print("-".rjust(80, '-'))
         print()
 
-
-# ---
-#
-# ---
-    def __visualizarCliente(self):
+    def __verCliente(self):
         print("Nombre: ", self.getNombre())
         print("Rut: ", self.getRut())
         print("E-Mail: ", self.getMail())
-        print("Tipo de cliente: ", self.getTipoCliente())
+        print("Tipo de cliente: ", self.getTipo())
 
-# ---
-# Visualiza los datos del credito del cliente.
-# ---
-    def __visualizarCredito(self):
-        if self.tieneCredito():
+    def __verCredito(self):
+        if self.conCredito():
             print()
-            self.__credito.mostrarDatos()
+            self.getCredito().getDatos()
         else:
             print("Cliente sin credito asociado.")
 
-
-# ---
-# Metodo str muestra el nombre del cliente y el tipo.
-# ---
     def __str__(self):
-        return self.getNombre()+" "+self.getTipoCliente()
+        return self.getNombre()+" "+self.getTipo()

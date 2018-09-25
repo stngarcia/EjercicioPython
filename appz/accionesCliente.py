@@ -11,9 +11,9 @@ def ingresarCliente(cliente):
 
 
 def __cabecera(cliente):
-    if cliente.existeCliente():
+    if cliente.existe():
         titulo("")
-        cliente.mostrarDatos()
+        cliente.getDatos()
     else:
         titulo("Ingresar cliente.")
 
@@ -23,7 +23,7 @@ def __leerDatos(cliente):
     cliente.setNombre(__leeNombre(miIngreso))
     cliente.setRut(__leeRut(miIngreso))
     cliente.setMail(__leeMail(miIngreso))
-    cliente.setTipoCliente(__leeTipo(miIngreso))
+    cliente.setTipo(__leeTipo(miIngreso))
 
 
 def __leeNombre(miIngreso):
@@ -55,7 +55,7 @@ def __leeTipo(miIngreso):
 
 def cambiarTipo(cliente):
     __cabecera(cliente)
-    if not cliente.existeCliente():
+    if not cliente.existe():
         pressEnter("No se ha ingresado un cliente para cambiar su tipo.")
         return
     __cambiaTipo(cliente)
@@ -64,21 +64,19 @@ def cambiarTipo(cliente):
 
 def __cambiaTipo(cliente):
     miIngreso = Ingresos()
-    cliente.setTipoCliente(__leeTipo(miIngreso))
+    cliente.setTipo(__leeTipo(miIngreso))
 
 
 def AsignaCredito(cliente, credito):
     titulo("Asignación de credito a cliente.")
     __muestraClienteCredito(cliente, credito)
-    if not cliente.existeCliente() or not credito.existeCredito():
+    if not cliente.existe() or not credito.existe():
         pressEnter(__msgAsignacion(cliente, credito))
         return
-    if cliente.getCredito().getCodigoCredito() == credito.getCodigoCredito():
+    if cliente.getCredito().checkCodigo(credito.getCodigo()):
         pressEnter("El cliente ya posee el crédito.")
         return
-    pagadas = cliente.getCredito().getCuotasPagadas()
-    pactadas = cliente.getCredito().getCuotasPactadas()
-    if (pactadas-pagadas) != 0:
+    if cliente.getCredito().estaPagando():
         pressEnter("Cliente esta pagando el crédito, no puede asignar otro.")
         return
     miOpcion = __leeAsignacion()
@@ -90,10 +88,10 @@ def AsignaCredito(cliente, credito):
 
 
 def __muestraClienteCredito(cliente, credito):
-    if cliente.existeCliente():
-        cliente.mostrarDatos()
-    if credito.existeCredito():
-        credito.mostrarDatos()
+    if cliente.existe():
+        cliente.getDatos()
+    if credito.existe():
+        credito.getDatos()
 
 
 def __leeAsignacion():
@@ -104,11 +102,11 @@ def __leeAsignacion():
 
 
 def __msgAsignacion(cliente, credito):
-    if not cliente.existeCliente() and not credito.existeCredito():
+    if not cliente.existe() and not credito.existe():
         return"No hay cliente ni crédito ingresado."
-    if not cliente.existeCliente():
+    if not cliente.existe():
         return "No hay un cliente ingresado."
-    if not credito.existeCredito():
+    if not credito.existe():
         return "No hay un crédito ingresado."
     return""
 
@@ -124,11 +122,11 @@ def cambiaMorosidad(cliente):
 
 
 def __verificaCliente(cliente):
-    if not cliente.existeCliente():
+    if not cliente.existe():
         pressEnter("No hay cliente ingresado")
         return False
-    cliente.mostrarDatos()
-    if not cliente.getCredito().existeCredito():
+    cliente.getDatos()
+    if not cliente.getCredito().existe():
         pressEnter("El cliente no tiene un crédito asociado")
         return False
     return True
@@ -147,11 +145,11 @@ def pagarCuota(cliente):
         if not __verificaCliente(cliente):
             break
         cuota = cliente.getCredito().getCuotasPagadas()
-        if cuota == cliente.getCredito().getCuotasPactadas():
-            pressEnter(
-                "Cliente finalizo el crédito, venda otro altiro!!")
+        if cliente.getCredito().fuePagado():
+            pressEnter("Cliente finalizo el crédito, venda otro altiro!!")
             break
         print("Pagar cuota número", cuota + 1)
+        cliente.getCredito().getEstadoCuota()
         opcion = __leerPago()
         if opcion == "X":
             break
