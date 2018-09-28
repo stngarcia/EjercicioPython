@@ -148,7 +148,6 @@ def pagarCuota(cliente):
         if cliente.getCredito().fuePagado():
             pressEnter("Cliente finalizo el crédito, venda otro altiro!!")
             break
-        print("Pagar cuota número", cuota + 1)
         cliente.getCredito().getEstadoCuota()
         opcion = __leerPago()
         if opcion == "X":
@@ -169,13 +168,16 @@ def mostrarCancelado(cliente):
     if not __verificaCliente(cliente):
         return
     credito = cliente.getCredito()
-    if credito.getCuotasMorosas() > 1:
+    if credito.getCuotasMorosas() > 0:
         print("Cuotas morosas:", credito.getCuotasMorosas())
         print(
             "Monto cancelado por mora ${0}.-".format(credito.getCanceladoConMora()))
-        print("Interés aaplicar {0:.2f}%".format(credito.getInteresAplicado()))
+        print("Interés aplicado {0:.2f}%".format(credito.getInteresAplicado()))
     print("Total cancelado ${0}.-".format(credito.getMontoCancelado()))
     print(
         "Falta por cancelar ${0}.-".format(credito.getMonto()-credito.getMontoCancelado()))
-
+    print()
+    cliente.getCredito().getListaCanceladas()
+    print()
+    cliente.getCredito().getListaMorosas()
     pressEnter("")

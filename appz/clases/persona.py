@@ -59,10 +59,9 @@ class Persona(object):
         print()
 
     def __verCliente(self):
-        print("Nombre: ", self.getNombre())
-        print("Rut: ", self.getRut())
-        print("E-Mail: ", self.getMail())
-        print("Tipo de cliente: ", self.getTipo())
+        print("Nombre: {0:<35} \t Rut: {1:<10}".format(self.getNombre(), self.getRut()))
+        print("Email: {0:<35} \t Tipo: {1}".format(
+            self.getMail(), self.getTipo()))
 
     def __verCredito(self):
         if self.conCredito():
