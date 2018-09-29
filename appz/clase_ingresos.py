@@ -1,6 +1,6 @@
 import re
 from datetime import datetime
-from .enumeraciones.enum_msg import EnumMsg
+from .enumeraciones.enum_msg import Msg
 
 
 class Ingresos(object):
@@ -16,16 +16,16 @@ class Ingresos(object):
         while True:
             print(mensaje, rango, end=": ")
             opcion = input()
-            if not self.__validaExp(patron, opcion, EnumMsg.NUMERO_INVALIDO):
+            if not self.__validaExp(patron, opcion, Msg.NUMERO_INVALIDO):
                 continue
             valor = int(opcion)
             if maximo == 0:
                 if valor < minimo:
-                    print(EnumMsg.NUMERO_MENOR.format(str(minimo)))
+                    print(Msg.NUMERO_MENOR.format(str(minimo)))
                     continue
             else:
                 if valor < minimo or valor > maximo:
-                    print(EnumMsg.NUMERO_FUERA_RANGO.format(
+                    print(Msg.NUMERO_FUERA_RANGO.format(
                         str(minimo), str(maximo)))
                     continue
             break
@@ -40,12 +40,12 @@ class Ingresos(object):
         return True
 
     def ingresarCadena(self, campo, patron, requerido):
-        msgError = EnumMsg.CADENA_INVALIDA.format(campo)
+        msgError = Msg.CADENA_INVALIDA.format(campo)
         while True:
             print("Ingrese", campo, end=": ")
             cadena = input()
             if requerido and len(cadena) == 0:
-                print(EnumMsg.CADENA_VACIA.format(campo))
+                print(Msg.CADENA_VACIA.format(campo))
                 continue
             if not self.__validaExp(patron, cadena, msgError):
                 continue
@@ -61,7 +61,7 @@ class Ingresos(object):
                 campo, cadena.rstrip(', ')), end=": ")
             opcion = input()
             if opcion.upper() not in listaOpc:
-                print(EnumMsg.VALOR_INVALIDO)
+                print(Msg.VALOR_INVALIDO)
                 print(cadena.rstrip(', '))
                 continue
             break
@@ -69,7 +69,7 @@ class Ingresos(object):
 
     def ingresarFecha(self, mensaje, minimo, maximo, patron):
         fmt = '%d/%m/%Y'
-        msgError = EnumMsg.FECHA_INVALIDA
+        msgError = Msg.FECHA_INVALIDA
         fecMin = self.__obtenerFecha(minimo)
         fecMax = self.__obtenerFecha(maximo)
         rango = "" if len(minimo) == 0 else ", rango ["+datetime.strftime(
@@ -82,12 +82,12 @@ class Ingresos(object):
             valor = self.__obtenerFecha(fecha)
             if len(maximo) == 0:
                 if valor < fecMin:
-                    print(EnumMsg.FECHA_MENOR.format(
+                    print(Msg.FECHA_MENOR.format(
                         datetime.strftime(fecMin, fmt)))
                     continue
             else:
                 if valor < fecMin or valor > fecMax:
-                    print(EnumMsg.FECHA_FUERA_RANGO.format(datetime.strftime(
+                    print(Msg.FECHA_FUERA_RANGO.format(datetime.strftime(
                         fecMin, fmt), datetime.strftime(fecMax, fmt)))
                     continue
             break

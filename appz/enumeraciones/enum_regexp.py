@@ -1,4 +1,6 @@
-class EnumRegEx:
+
+
+class Exp:
 
     # Expresion regular aplicada al nombre.
     __parteNombre = "^([A-Za-zÑñ\-]{1,})"

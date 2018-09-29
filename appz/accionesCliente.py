@@ -1,75 +1,43 @@
 import copy
-from .clase_ingresos import Ingresos
-from .enumeraciones.enum_regexp import EnumRegEx
-from .funciones import pressEnter, titulo
+from .enumeraciones.enum_regexp import Exp
+from .enumeraciones.enum_opciones import Opciones
+from .funciones import pressEnter, titulo, leee, selecciona
 
 
 def ingresarCliente(cliente):
-    __cabecera(cliente)
+    titulo("Ingresar cliente.")
+    __cabecera(cliente, None, False)
     __leerDatos(cliente)
     pressEnter("El cliente ha sido creado.")
 
 
-def __cabecera(cliente):
+def __cabecera(cliente, credito, muestraCredito):
     if cliente.existe():
-        titulo("")
         cliente.getDatos()
-    else:
-        titulo("Ingresar cliente.")
+    if credito and muestraCredito:
+        credito.getDatos()
 
 
 def __leerDatos(cliente):
-    miIngreso = Ingresos()
-    cliente.setNombre(__leeNombre(miIngreso))
-    cliente.setRut(__leeRut(miIngreso))
-    cliente.setMail(__leeMail(miIngreso))
-    cliente.setTipo(__leeTipo(miIngreso))
-
-
-def __leeNombre(miIngreso):
-    campo = "nombre cliente"
-    requerido = True
-    patron = EnumRegEx.NOMBRE
-    return miIngreso.ingresarCadena(campo, patron, requerido).title()
-
-
-def __leeRut(miIngreso):
-    campo = "rut cliente"
-    requerido = True
-    patron = EnumRegEx.RUT
-    return miIngreso.ingresarCadena(campo, patron, requerido)
-
-
-def __leeMail(miIngreso):
-    campo = "e-mail"
-    requerido = False
-    patron = EnumRegEx.EMAIL
-    return miIngreso.ingresarCadena(campo, patron, requerido)
-
-
-def __leeTipo(miIngreso):
-    tipos = {'N': 'Cliente normal', 'P': 'Cliente preferencial'}
-    campo = "tipo de cliente"
-    return miIngreso.ingresarCaracter(campo, tipos)
+    cliente.setNombre(leee("nombre", True, Exp.NOMBRE))
+    cliente.setRut(leee("rut", True, Exp.RUT))
+    cliente.setMail(leee("e-mail", False, Exp.EMAIL))
+    cliente.setTipo(selecciona("tipo", Opciones.Tipo))
 
 
 def cambiarTipo(cliente):
-    __cabecera(cliente)
+    titulo("Cambio de tipo de cliente.")
+    __cabecera(cliente, None, False)
     if not cliente.existe():
         pressEnter("No se ha ingresado un cliente para cambiar su tipo.")
         return
-    __cambiaTipo(cliente)
+    cliente.setTipo(selecciona("tipo", Opciones.Tipo))
     pressEnter("El tipo de cliente ha sido cambiado.")
-
-
-def __cambiaTipo(cliente):
-    miIngreso = Ingresos()
-    cliente.setTipo(__leeTipo(miIngreso))
 
 
 def AsignaCredito(cliente, credito):
     titulo("Asignación de credito a cliente.")
-    __muestraClienteCredito(cliente, credito)
+    __cabecera(cliente, credito, True)
     if not cliente.existe() or not credito.existe():
         pressEnter(__msgAsignacion(cliente, credito))
         return
@@ -79,26 +47,12 @@ def AsignaCredito(cliente, credito):
     if cliente.getCredito().estaPagando():
         pressEnter("Cliente esta pagando el crédito, no puede asignar otro.")
         return
-    miOpcion = __leeAsignacion()
+    miOpcion = selecciona("opción", Opciones.Asigna)
     if miOpcion == "N":
         pressEnter("El crédito no se asocio.")
         return
     cliente.setCredito(copy.copy(credito))
     pressEnter("Crédito fue asociado al cliente.")
-
-
-def __muestraClienteCredito(cliente, credito):
-    if cliente.existe():
-        cliente.getDatos()
-    if credito.existe():
-        credito.getDatos()
-
-
-def __leeAsignacion():
-    miIngreso = Ingresos()
-    misOpciones = {'S': 'Asociar crédito', 'N': 'No asociar'}
-    campo = "opción"
-    return miIngreso.ingresarCaracter(campo, misOpciones)
 
 
 def __msgAsignacion(cliente, credito):
@@ -115,7 +69,7 @@ def cambiaMorosidad(cliente):
     titulo("Cambiar el estado del crédito.")
     if not __verificaCliente(cliente):
         return
-    miOpcion = __leerEstado()
+    miOpcion = selecciona("opción", Opciones.Estado)
     credito = cliente.getCredito()
     credito.setMorosidad(False if miOpcion == "A" else True)
     pressEnter("El estado del crédito del cliente ha cambiado.")
@@ -132,13 +86,6 @@ def __verificaCliente(cliente):
     return True
 
 
-def __leerEstado():
-    miIngreso = Ingresos()
-    misOpciones = {'M': 'Cliente moroso', 'A': 'Cliente al día'}
-    campo = "opción"
-    return miIngreso.ingresarCaracter(campo, misOpciones)
-
-
 def pagarCuota(cliente):
     while True:
         titulo("Pagar cuota de credito.")
@@ -149,18 +96,11 @@ def pagarCuota(cliente):
             pressEnter("Cliente finalizo el crédito, venda otro altiro!!")
             break
         cliente.getCredito().getEstadoCuota()
-        opcion = __leerPago()
+        opcion = selecciona("opción", Opciones.Pago)
         if opcion == "X":
             break
         cuota = cuota+1
         cliente.getCredito().setCuotasPagadas(cuota)
-
-
-def __leerPago():
-    miIngreso = Ingresos()
-    misOpciones = {'P': 'Pagar una cuota', 'X': 'Salir de pagos'}
-    campo = "opción"
-    return miIngreso.ingresarCaracter(campo, misOpciones)
 
 
 def mostrarCancelado(cliente):
@@ -168,16 +108,13 @@ def mostrarCancelado(cliente):
     if not __verificaCliente(cliente):
         return
     credito = cliente.getCredito()
-    if credito.getCuotasMorosas() > 0:
+    if credito.getCuotasMorosas():
         print("Cuotas morosas:", credito.getCuotasMorosas())
         print(
             "Monto cancelado por mora ${0}.-".format(credito.getCanceladoConMora()))
-        print("Interés aplicado {0:.2f}%".format(credito.getInteresAplicado()))
+        print("Interés aplicado {0:.2f}%".format(credito.getInteres()))
     print("Total cancelado ${0}.-".format(credito.getMontoCancelado()))
-    print(
-        "Falta por cancelar ${0}.-".format(credito.getMonto()-credito.getMontoCancelado()))
-    print()
-    cliente.getCredito().getListaCanceladas()
-    print()
-    cliente.getCredito().getListaMorosas()
+    print("Por cancelar ${0}.-".format(credito.getMonto() -
+                                       credito.getMontoCancelado()))
+    credito.getListaCuotas()
     pressEnter("")

@@ -1,25 +1,19 @@
 from datetime import datetime
 from .cuotas import Cuotas
-from .cuotasMorosas import CuotasMorosas
 
 
 class Credito(object):
 
     __interes = 0.15
-    __alDia = list()
-    __morosas = list()
+    __cuotas = list()
+    __fmt = '%d/%m/%Y'
 
     def __init__(self):
-        self.__fmt = '%d/%m/%Y'
         self.__codigo = ""
         self.__fechaSolicitud = datetime.strptime('01/01/2018', self.__fmt)
         self.__fechaVencimiento = datetime.strptime('01/01/2018', self.__fmt)
         self.__montoSolicitado = 0
         self.__morosidad = False
-        self.__cuotasPagadas = 0
-        self.__cuotasMorosas = 1
-        self.__montoCancelado = 0
-        self.__montoCanceladoMoroso = 0
 
     def getCodigo(self):
         return self.__codigo
@@ -37,13 +31,13 @@ class Credito(object):
         return self.__morosidad
 
     def getCuotasPagadas(self):
-        return (len(self.__alDia)+len(self.__morosas))
+        return len(self.__cuotas)
 
     def getCuotasMorosas(self):
-        return len(self.__morosas)
+        return len([c for c in self.__cuotas if c.esMorosa()])
 
-    def getInteresAplicado(self):
-        return self.__interes
+    def getInteres(self):
+        return self.__interes if self.getMorosidad() else 0
 
     def getCuotasPactadas(self):
         diferencia = int((self.getFechaVencimiento() -
@@ -60,44 +54,32 @@ class Credito(object):
         return True if self.getCuotasPagadas() > 0 else False
 
     def getValorCuota(self):
-        valor = int(self.getMonto()/self.getCuotasPactadas())
-        return valor
+        return int(self.getMonto()/self.getCuotasPactadas())
 
     def getMontoCancelado(self):
-        valor = 0
-        for cta in self.__alDia:
-            valor = valor + cta.getMonto()
-        for cta in self.__morosas:
-            valor = valor+cta.getMonto()
-        return valor
+        if not self.__cuotas:
+            return 0
+        return sum([c.getMonto() for c in self.__cuotas])
 
     def getCanceladoConMora(self):
-        valor = 0
-        for cta in self.__morosas:
-            valor = valor + cta.getValorInteres()
-        return valor
+        if not self.__cuotas:
+            return 0
+        return sum([c.getValorInteres() for c in self.__cuotas])
 
-    def getListaCanceladas(self):
-        if not self.__alDia:
+    def getListaCuotas(self):
+        if not self.__cuotas:
             return
-            print()
-            print()
-            print("Cuotas canceladas al día.")
-        print("Cuota\tFecha\t\tMonto")
-        for cta in self.__alDia:
-            print("{0:^5}\t{1:%d/%m/%Y}\t${2:>10}.-".format(cta.getNumero(),
-                                                            cta.getFecha(), cta.getMonto()))
-
-    def getListaMorosas(self):
-        if not self.__morosas:
-            return
-            print()
-            print()
-            print("Cuotas morosas canceladas.")
+        print()
+        print("{0:^80}".format("Lista de cuotas."))
+        print("-".rjust(80, '-'))
         print("Cuota\tFecha\t\tMonto\t\tInterés\tValor interés\tTotal cancelado")
-        for cta in self.__morosas:
-            print("{0:^5}\t{1:%d/%m/%Y}\t${2:>10}.-\t{3:.2f}\t${4:>10}.-\t${5:>10}.-".format(cta.getNumero(),
-                                                                                             cta.getFecha(), cta.getMonto(), cta.getInteres(), cta.getValorInteres(),  cta.GetTotalCuota()))
+        print("-".rjust(80, '-'))
+        for c in self.__cuotas:
+            cad = "{0:^5}\t{1:%d/%m/%Y}\t${2:>10}.-\t{3:.2f}\t${4:>10}.-\t${5:>12}.-"
+            cad = cad.format(c.getNumero(), c.getFecha(), c.getMonto(),
+                             c.getInteres(), c.getValorInteres(),  c.GetTotalCuota())
+            print(cad)
+        print("-".rjust(80, '-'))
 
     def setCodigo(self, codigo):
         self.__codigo = codigo
@@ -115,15 +97,9 @@ class Credito(object):
         self.__morosidad = morosidad
 
     def setCuotasPagadas(self, cuotasPagadas):
-        self.__cuotasPagadas = cuotasPagadas
-        if not self.getMorosidad():
-            miCuota = Cuotas(cuotasPagadas, self.__fechaSolicitud,
-                             self.getValorCuota())
-            self.__alDia.append(miCuota)
-        else:
-            miCuota = CuotasMorosas(cuotasPagadas, self.__fechaSolicitud,
-                                    self.getValorCuota(), self.__interes)
-            self.__morosas.append(miCuota)
+        miCuota = Cuotas(cuotasPagadas, self.__fechaSolicitud,
+                         self.getValorCuota(), self.getInteres())
+        self.__cuotas.append(miCuota)
 
     def existe(self):
         return True if self.__codigo else False
@@ -132,12 +108,8 @@ class Credito(object):
         return True if self.getCodigo() == codigo else False
 
     def getEstadoCuota(self):
-        if not self.getMorosidad():
-            miCuota = CuotasMorosas(self.__cuotasPagadas+1, self.__fechaSolicitud,
-                                    self.getValorCuota())
-        else:
-            miCuota = CuotasMorosas(self.__cuotasPagadas+1, self.__fechaSolicitud,
-                                    self.getValorCuota(), self.__interes)
+        miCuota = Cuotas(self.getCuotasPagadas()+1, self.__fechaSolicitud,
+                         self.getValorCuota(), self.getInteres())
         print("Número de cuota a pagar: {0} ".format(miCuota.getNumero()))
         print("Valor cuota ${0}.-".format(miCuota.getMonto()))
         print("Interés a aplicar {0:.2f}% (${1}.-)".format(
@@ -145,7 +117,7 @@ class Credito(object):
         print("Total a pagar ${0}.-".format(miCuota.GetTotalCuota()))
 
     def getDatos(self):
-        print("Datos de credito")
+        print("{0:^80}".format("Datos de credito"))
         print("-".rjust(80, '-'))
         print("Código: ", self.getCodigo(), sep="\t\t")
         print("Fecha solicitud {0:%d/%m/%Y} \t Fecha vencimiento {1:%d/%m/%Y} ".format(

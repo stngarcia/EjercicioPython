@@ -4,7 +4,7 @@ from .accionesCreditos import ingresaCredito
 from .clase_ingresos import Ingresos
 from .clases.credito import Credito
 from .clases.persona import Persona
-from .enumeraciones.enum_regexp import EnumRegEx
+from .enumeraciones.enum_regexp import Exp
 from .funciones import titulo
 
 
@@ -31,7 +31,7 @@ class Menus(object):
         while opcion != 0:
             self.__opciones()
             opcion = miEntrada.ingresaNumero(
-                "Ingrese opción", 0, 7, EnumRegEx.NUMERO)
+                "Ingrese opción", 0, 7, Exp.NUMERO)
             if opcion == 1:
                 ingresaCredito(credito)
             if opcion == 2:

@@ -51,17 +51,18 @@ class Persona(object):
         return False if len(self.getCredito().getCodigo()) == 0 else True
 
     def getDatos(self):
-        print("Datos del cliente.")
+        print("{0:^80}".format("Datos del cliente."))
         print("-".rjust(80, '-'))
         self.__verCliente()
         self.__verCredito()
-        print("-".rjust(80, '-'))
         print()
 
     def __verCliente(self):
-        print("Nombre: {0:<35} \t Rut: {1:<10}".format(self.getNombre(), self.getRut()))
+        print("Nombre: {0:<35} \t Rut: {1:<10}".format(
+            self.getNombre(), self.getRut()))
         print("Email: {0:<35} \t Tipo: {1}".format(
             self.getMail(), self.getTipo()))
+        print("-".rjust(80, '-'))
 
     def __verCredito(self):
         if self.conCredito():

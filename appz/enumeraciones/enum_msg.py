@@ -1,4 +1,6 @@
-class EnumMsg:
+
+
+class Msg:
 
     # Cadenas para el ingreso de numeros.
     NUMERO_INVALIDO = "Solo se admiten números"

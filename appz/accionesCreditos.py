@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from .funciones import titulo, pressEnter
 from .clase_ingresos import Ingresos
-from .enumeraciones.enum_regexp import EnumRegEx
+from .enumeraciones.enum_regexp import Exp
 
 
 def ingresaCredito(credito):
@@ -30,13 +30,13 @@ def __leerDatos(credito):
 def __leeCodigo(miIngreso):
     campo = "Código crédito"
     requerido = True
-    patron = EnumRegEx.CODIGO
+    patron = Exp.CODIGO
     return miIngreso.ingresarCadena(campo, patron, requerido)
 
 
 def __leeFechaSolicitud(miIngreso):
     campo = "fecha de solicitud"
-    patron = EnumRegEx.FECHA
+    patron = Exp.FECHA
     return miIngreso.ingresarFecha(campo, "", "", patron)
 
 
@@ -46,11 +46,11 @@ def __leeFechaVencimiento(miIngreso, fechaInicio):
         fechaInicio+timedelta(days=(30*12)), '%d/%m/%Y')
     fechaFinal = datetime.strftime(
         fechaInicio+timedelta(days=(30*120)), '%d/%m/%Y')
-    patron = EnumRegEx.FECHA
+    patron = Exp.FECHA
     return miIngreso.ingresarFecha(campo, fechaInicial, fechaFinal, patron)
 
 
 def ____leeMonto(miIngreso):
     campo = "monto solicitado"
-    patron = EnumRegEx.NUMERO
+    patron = Exp.NUMERO
     return miIngreso.ingresaNumero(campo, 6000000, 0, patron)
