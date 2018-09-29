@@ -1,4 +1,4 @@
-from .accionesCliente import ingresarCliente, cambiarTipo, pagarCuota
+from .accionesCliente import ingresarCliente, cambiarTipo, pagarCuota, extenderCredito
 from .accionesCliente import AsignaCredito, cambiaMorosidad, mostrarCancelado
 from .accionesCreditos import ingresaCredito
 from .clase_ingresos import Ingresos
@@ -31,7 +31,7 @@ class Menus(object):
         while opcion != 0:
             self.__opciones()
             opcion = miEntrada.ingresaNumero(
-                "Ingrese opción", 0, 7, Exp.NUMERO)
+                "Ingrese opción", 0, 8, Exp.NUMERO)
             if opcion == 1:
                 ingresaCredito(credito)
             if opcion == 2:
@@ -45,6 +45,8 @@ class Menus(object):
             if opcion == 6:
                 pagarCuota(cliente)
             if opcion == 7:
+                extenderCredito(cliente)
+            if opcion == 8:
                 mostrarCancelado(cliente)
             if opcion == 0:
                 print("Eso fue todo, chao!")

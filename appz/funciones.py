@@ -44,3 +44,8 @@ def leee(campo, requerido, patron):
 def selecciona(campo, opciones):
     miIngreso = Ingresos()
     return miIngreso.ingresarCaracter(campo, opciones)
+
+
+def leeNro(campo, minVal, maxVal, patron):
+    miIngreso = Ingresos()
+    return miIngreso.ingresaNumero(campo, minVal, maxVal, patron)

@@ -1,7 +1,7 @@
 import copy
 from .enumeraciones.enum_regexp import Exp
 from .enumeraciones.enum_opciones import Opciones
-from .funciones import pressEnter, titulo, leee, selecciona
+from .funciones import pressEnter, titulo, leee, selecciona, leeNro
 
 
 def ingresarCliente(cliente):
@@ -107,14 +107,17 @@ def mostrarCancelado(cliente):
     titulo("Mostrar montos cancelados")
     if not __verificaCliente(cliente):
         return
-    credito = cliente.getCredito()
-    if credito.getCuotasMorosas():
-        print("Cuotas morosas:", credito.getCuotasMorosas())
-        print(
-            "Monto cancelado por mora ${0}.-".format(credito.getCanceladoConMora()))
-        print("Interés aplicado {0:.2f}%".format(credito.getInteres()))
-    print("Total cancelado ${0}.-".format(credito.getMontoCancelado()))
-    print("Por cancelar ${0}.-".format(credito.getMonto() -
-                                       credito.getMontoCancelado()))
-    credito.getListaCuotas()
+    cliente.getCredito().getInfoCredito()
     pressEnter("")
+
+
+def extenderCredito(cliente):
+    titulo("Extender crédito.")
+    if not __verificaCliente(cliente):
+        return
+    if cliente.getCredito().getExtension():
+        pressEnter("El crédito del cliente ya ha sido extendido.")
+        return
+    extension = leeNro("meses de extensión", 5, 12, Exp.NUMERO)
+    cliente.getCredito().setExtension(extension)
+    pressEnter("El  crédito fue extendido en {0} meses".format(extension))

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from .cuotas import Cuotas
 
 
@@ -14,6 +14,7 @@ class Credito(object):
         self.__fechaVencimiento = datetime.strptime('01/01/2018', self.__fmt)
         self.__montoSolicitado = 0
         self.__morosidad = False
+        self.__extension = 0
 
     def getCodigo(self):
         return self.__codigo
@@ -44,6 +45,9 @@ class Credito(object):
                           self.getFechaSolicitud()).days)
         cuotas = int((diferencia/30))
         return cuotas
+
+    def getExtension(self):
+        return self.__extension
 
     def fuePagado(self):
         return True if self.getCuotasPactadas() == self.getCuotasPagadas() else False
@@ -80,6 +84,8 @@ class Credito(object):
                              c.getInteres(), c.getValorInteres(),  c.GetTotalCuota())
             print(cad)
         print("-".rjust(80, '-'))
+        print("Totales:\t\t${0:>10}.-\t\t${1:>10}.-\t${2:>10}.-".format(
+            self.getMontoCancelado(), self.getCanceladoConMora(), self.getMontoCancelado()+self.getCanceladoConMora()))
 
     def setCodigo(self, codigo):
         self.__codigo = codigo
@@ -101,6 +107,11 @@ class Credito(object):
                          self.getValorCuota(), self.getInteres())
         self.__cuotas.append(miCuota)
 
+    def setExtension(self, extension):
+        self.__extension = extension
+        self.__fechaVencimiento = self.__fechaVencimiento + \
+            timedelta(days=(30*extension))
+
     def existe(self):
         return True if self.__codigo else False
 
@@ -116,6 +127,17 @@ class Credito(object):
             miCuota.getInteres(), miCuota.getValorInteres()))
         print("Total a pagar ${0}.-".format(miCuota.GetTotalCuota()))
 
+    def getInfoCredito(self):
+        print("{0:^80}".format("Estado del credito."))
+        print("-".rjust(80, '-'))
+        if self.getCuotasMorosas():
+            print("Cuotas morosas:", self.getCuotasMorosas())
+            print("Interés: {0:.2f}%\t\t\t Monto cancelado por mora ${1}.-".format(
+                self.__interes, self.getCanceladoConMora()))
+        print("Total cancelado ${0}.-\t Falta por cancelar ${1}.-".format(self.getMontoCancelado(),
+                                                                          self.getMonto()-self.getMontoCancelado()))
+        self.getListaCuotas()
+
     def getDatos(self):
         print("{0:^80}".format("Datos de credito"))
         print("-".rjust(80, '-'))
@@ -126,7 +148,9 @@ class Credito(object):
             self.getMonto(),  self.getCuotasPactadas()))
         print("Valor cuota ${0}.- \t\t Cuotas pagadas: {1}".format(
             self.getValorCuota(), self.getCuotasPagadas()))
-        print("Tiene morosidad:", self.getMorosidad())
+        estado = "Moroso." if self.getMorosidad() else "Al día."
+        extend = "No." if not self.getExtension() else "Sí, en {0} meses".format(self.getExtension())
+        print("Estado {0}\t\t\t Extendido: {1}".format(estado,extend))
         if self.fuePagado():
             print("Credito finalizado!")
         print("-".rjust(80, '-'))
