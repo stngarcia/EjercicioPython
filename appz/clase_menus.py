@@ -1,15 +1,20 @@
+# Archivo: clases_menus.py
+# Clase que genera el menú de opciones.
+
+
 from .accionesCliente import ingresarCliente, cambiarTipo, pagarCuota, extenderCredito
 from .accionesCliente import AsignaCredito, cambiaMorosidad, mostrarCancelado
 from .accionesCreditos import ingresaCredito
-from .clase_ingresos import Ingresos
 from .clases.credito import Credito
 from .clases.persona import Persona
 from .enumeraciones.enum_regexp import Exp
-from .funciones import titulo
+from .funciones import titulo, leeNro
 
 
 class Menus(object):
 
+    # __opciones()
+    # Muestra las opciones del menú
     def __opciones(self):
         titulo("Opciones disponibles.")
         print("1. Crear crédito.")
@@ -23,15 +28,16 @@ class Menus(object):
         print("0. Salir")
         print()
 
+
+# mostrarMenu()
+# Muestra el menú en pantalla y ejecuta las acciones desplegadas.
     def mostrarMenu(self):
         cliente = Persona()
         credito = Credito()
         opcion = 1
-        miEntrada = Ingresos()
-        while opcion != 0:
+        while opcion:
             self.__opciones()
-            opcion = miEntrada.ingresaNumero(
-                "Ingrese opción", 0, 8, Exp.NUMERO)
+            opcion = leeNro("Ingrese su opción", 0, 8, Exp.NUMERO)
             if opcion == 1:
                 ingresaCredito(credito)
             if opcion == 2:

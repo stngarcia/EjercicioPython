@@ -149,8 +149,9 @@ class Credito(object):
         print("Valor cuota ${0}.- \t\t Cuotas pagadas: {1}".format(
             self.getValorCuota(), self.getCuotasPagadas()))
         estado = "Moroso." if self.getMorosidad() else "Al día."
-        extend = "No." if not self.getExtension() else "Sí, en {0} meses".format(self.getExtension())
-        print("Estado {0}\t\t\t Extendido: {1}".format(estado,extend))
+        extend = "No." if not self.getExtension(
+        ) else "Sí, en {0} meses".format(self.getExtension())
+        print("Estado {0}\t\t\t Extendido: {1}".format(estado, extend))
         if self.fuePagado():
             print("Credito finalizado!")
         print("-".rjust(80, '-'))

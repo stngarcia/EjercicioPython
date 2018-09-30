@@ -1,3 +1,7 @@
+# Archivo: clases_ingresos.py
+# Clase para manipular el ingreso de datos.
+
+
 import re
 from datetime import datetime
 from .enumeraciones.enum_msg import Msg
@@ -5,6 +9,14 @@ from .enumeraciones.enum_msg import Msg
 
 class Ingresos(object):
 
+    # ingresaNumero(mensaje, minimo, maximo, patron)
+    # Permite ingresar un número, indicando sus rangos minimos o maximos.
+    # mensaje: texto a desplegar al solicitar el número.
+    # minimo: valor mínimo permitido.
+    # maximo: valor máximo permitido.
+    # patron: expresión regular aplicada para la validación.
+    # Permite realizar el ingreso de números.
+    # retorna el numero ingresado como valor entero.
     def ingresaNumero(self, mensaje, minimo, maximo, patron):
         valor = 0
         if maximo == 0:
@@ -31,14 +43,26 @@ class Ingresos(object):
             break
         return valor
 
+    # __validaExp(patron, valor, msgError):
+    # Valida que la expresión regular se aplica alvalor ingresado.
+    # patron: expresión regular a validar.
+    # valor: valorque será evaluado con la expresión regular.
+    # msgError: mensaje de error a mostrar en caso de no cumplir el criterio evaluado.
+    # Retorna true, siel valor cumple el criterio, false si no lo cumple.
     def __validaExp(self, patron, valor, msgError):
-        if len(patron) == 0:
+        if not patron:
             return True
         if not re.match(patron, valor):
             print(msgError)
             return False
         return True
 
+    # ingresarCadena(campo, patron, requerido):
+    # Permite realizar el ingreso de un campo en formato string.
+    # campo: texto a desplegar en el ingreso.
+    # patron: expresión regular que evaluará al campo.
+    # requerido: indica si el campo es obligatorio (true), o si es opcional (false)
+    # retorna la cadena de con el valor ingresado.
     def ingresarCadena(self, campo, patron, requerido):
         msgError = Msg.CADENA_INVALIDA.format(campo)
         while True:
@@ -52,6 +76,11 @@ class Ingresos(object):
             break
         return cadena
 
+    # ingresarCaracter(campo, listaOpc):
+    # Permite ingresar el caracter de una lista de opciones.
+    # campo: texto desplegado al ingresar el valor.
+    # opciones: diccionario que contiene las opciones a desplegar.
+    # retorna el caracter de la opción ingresada.
     def ingresarCaracter(self, campo, listaOpc):
         cadena = ""
         for clave, valor in listaOpc.items():
@@ -67,6 +96,13 @@ class Ingresos(object):
             break
         return opcion.upper()
 
+    # ingresarFecha(mensaje, minimo, maximo, patron):
+    # Permite realizar el ingreso de fechas, validando sus rangos de entrada.
+    # mensaje: texto el cual desplegará para el ingreso.
+    # mínimo: fecha mínima que será aceptada en el rango de ingreso.
+    # maximo: fecha máxima que será aceptada en el ingreso.
+    # patron: expresión regular que será aplicada al ingreso de la fecha.
+    # retorna la fecha ingresada en formato "datetime"
     def ingresarFecha(self, mensaje, minimo, maximo, patron):
         fmt = '%d/%m/%Y'
         msgError = Msg.FECHA_INVALIDA
@@ -93,10 +129,10 @@ class Ingresos(object):
             break
         return valor
 
-
-# ---
-# Metodo para formatear las fechas y que sean comparables.
-# ---
+    # __obtenerFecha(valFecha)
+    # Permite asignar un tipo de dato fecha a la cadena ingresada.
+    # valFecha: fecha a convertir a formato "datetime"
+    # retorna la fecha en formato "datetime"
     def __obtenerFecha(self, valFecha):
         fmt = '%d/%m/%Y'
         fecha = datetime.strftime(datetime.now().date(), fmt)
